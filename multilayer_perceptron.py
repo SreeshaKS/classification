@@ -128,7 +128,10 @@ class MultilayerPerceptron:
 
         for epoch in range(self.n_iterations):
             self.forward_propagation(self._X)
-            cost = self._loss_function(self.A2, self._y)
+
+            if epoch % 20 == 0:
+                cost = self._loss_function(self.A2, self._y)
+                self._loss_history.append(cost)
 
             self.backward_propagation(self._X, self._y)
 
