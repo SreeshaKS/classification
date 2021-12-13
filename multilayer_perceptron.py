@@ -100,11 +100,9 @@ class MultilayerPerceptron:
         """
         np.random.seed(42)
         self._X = X
-        self._y = one_hot_encoding(y) 
+        self._y = one_hot_encoding(y)
 
-        
-
-        n_x = self._X.shape[1]# size of input layer
+        n_x = self._X.shape[1]  # size of input layer
         n_h = self.n_hidden
         n_y = self._y.shape[1]  # size of output layer
 
@@ -124,7 +122,7 @@ class MultilayerPerceptron:
         Returns:
             None.
         """
-        self._initialize(X,y)
+        self._initialize(X, y)
 
         for epoch in range(self.n_iterations):
             self.forward_propagation(self._X)
@@ -140,48 +138,27 @@ class MultilayerPerceptron:
         b1 = self._h_bias
         W2 = self._o_weights
         b2 = self._o_bias
-        
+
         self.Z1 = np.dot(X, W1) + b1
         self.A1 = self.hidden_activation(self.Z1)
         self.Z2 = np.dot(self.A1, W2) + b2
         self.A2 = self._output_activation(self.Z2)
 
     def backward_propagation(self, X, y):
-        '''
-                    # output layer->hidden layer
-            loss_gradient_o_h = self._loss_function(self._y, prediction) \
-                                   * self._output_activation(o_input, derivative=True)
-            grad_v = h_output.T.dot(loss_gradient_o_h)
-            grad_v0 = np.sum(loss_gradient_o_h, axis=0, keepdims=True)
-            # hidden layer->input layer
-            gradient_hidden_input = loss_gradient_o_h.dot(self._o_weights.T) \
-                                    * self.hidden_activation(h_input, derivative=True)
-            grad_w = self._X.T.dot(gradient_hidden_input)
-            grad_w0 = np.sum(gradient_hidden_input, axis=0, keepdims=True)
-
-            # Nudge weights (by gradient descent)
-            self._o_weights -= self.learning_rate * grad_v
-            self._o_bias -= self.learning_rate * grad_v0
-            self._h_weights -= self.learning_rate * grad_w
-            self._h_bias -= self.learning_rate * grad_w0
-        '''
-        m = X.shape[1]
-
-        W1 = self._h_weights
         W2 = self._o_weights
 
         A1 = self.A1
         A2 = self.A2
 
-        loss_gradient_o_h = (A2-y) * self._output_activation(A2, derivative=True)
+        # output layer->hidden layer
+        loss_gradient_o_h = (A2 - y) * self._output_activation(A2, derivative=True)
         grad_v = self.A1.T.dot(loss_gradient_o_h)
         grad_v0 = np.sum(loss_gradient_o_h, axis=0, keepdims=True)
-        
+
         # hidden layer->input layer
         gradient_hidden_input = np.dot(loss_gradient_o_h, W2.T) * self.hidden_activation(A1, derivative=True)
         grad_w = self._X.T.dot(gradient_hidden_input)
         grad_w0 = np.sum(gradient_hidden_input, axis=0, keepdims=True)
-        
 
         self._o_weights -= self.learning_rate * grad_v
         self._o_bias -= self.learning_rate * grad_v0
@@ -199,5 +176,5 @@ class MultilayerPerceptron:
         """
 
         self.forward_propagation(X)
-        
+
         return self.A2.argmax(axis=1)
