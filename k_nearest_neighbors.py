@@ -88,8 +88,6 @@ class KNearestNeighbors:
         nearest_distances = np.zeros(shape=(X.shape[0], self.n_neighbors), dtype=np.int) - 1
 
         for i in range(X.shape[0]):
-            if (i + 1) % 100 == 0:
-                print("Object {} out of {} has been predicted".format(i + 1, X.shape[0]))
             distances = self._metric_func(X[i], self._X)
             index_order = np.argsort(distances)[:self.n_neighbors]
             nearest_indices[i] = index_order
@@ -110,7 +108,7 @@ class KNearestNeighbors:
 
         y = np.zeros(shape=(X.shape[0],))
 
-        nearest_indices, nearest_distances = self._nearest_neighbors(X)
+        nearest_indices, _ = self._nearest_neighbors(X)
         nearest_labels = self._y[nearest_indices]
 
         for i in range(X.shape[0]):
