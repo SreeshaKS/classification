@@ -7,6 +7,7 @@
 import numpy as np
 
 
+# https://stackoverflow.com/questions/1401712/how-can-the-euclidean-distance-be-calculated-with-numpy
 def euclidean_distance(x1, x2):
     """
     Computes and returns the Euclidean distance between two vectors.
@@ -16,9 +17,10 @@ def euclidean_distance(x1, x2):
         x2: A numpy array of shape (n_features,).
     """
 
-    raise NotImplementedError('This function must be implemented by the student.')
+    return np.linalg.norm(x1 - x2, ord=2, axis=1)
 
 
+# https://stackoverflow.com/questions/1401712/how-can-the-euclidean-distance-be-calculated-with-numpy
 def manhattan_distance(x1, x2):
     """
     Computes and returns the Manhattan distance between two vectors.
@@ -28,10 +30,14 @@ def manhattan_distance(x1, x2):
         x2: A numpy array of shape (n_features,).
     """
 
-    raise NotImplementedError('This function must be implemented by the student.')
+    return np.linalg.norm(x1 - x2, ord=1, axis=1)
 
 
-def identity(x, derivative = False):
+def d_identity(x):
+    return 0
+
+
+def identity(x, derivative=False):
     """
     Computes and returns the identity activation function of the given input data x. If derivative = True,
     the derivative of the activation function is returned instead.
@@ -41,10 +47,16 @@ def identity(x, derivative = False):
         derivative: A boolean representing whether or not the derivative of the function should be returned instead.
     """
 
-    raise NotImplementedError('This function must be implemented by the student.')
+    if not derivative:
+        return x
+    return 1
 
 
-def sigmoid(x, derivative = False):
+def d_sigmoid(x):
+    return (lambda _x: _x * (1 - _x))
+
+
+def sigmoid(x, derivative=False):
     """
     Computes and returns the sigmoid (logistic) activation function of the given input data x. If derivative = True,
     the derivative of the activation function is returned instead.
@@ -53,11 +65,16 @@ def sigmoid(x, derivative = False):
         x: A numpy array of shape (n_samples, n_hidden).
         derivative: A boolean representing whether or not the derivative of the function should be returned instead.
     """
+    if not derivative:
+        return (lambda _x: 1 / (1 + np.exp(-_x)))
+    return d_sigmoid(x)
 
-    raise NotImplementedError('This function must be implemented by the student.')
+
+def d_tanh(x):
+    return (lambda _x: 1 - x ** 2)
 
 
-def tanh(x, derivative = False):
+def tanh(x, derivative=False):
     """
     Computes and returns the hyperbolic tangent activation function of the given input data x. If derivative = True,
     the derivative of the activation function is returned instead.
@@ -67,10 +84,16 @@ def tanh(x, derivative = False):
         derivative: A boolean representing whether or not the derivative of the function should be returned instead.
     """
 
-    raise NotImplementedError('This function must be implemented by the student.')
+    if not derivative:
+        return (lambda _x: np.tanh(_x))
+    return d_tanh(x)
 
 
-def relu(x, derivative = False):
+def d_relu(x):
+    return (lambda _x: 1 * (_x > 0))
+
+
+def relu(x, derivative=False):
     """
     Computes and returns the rectified linear unit activation function of the given input data x. If derivative = True,
     the derivative of the activation function is returned instead.
@@ -80,14 +103,16 @@ def relu(x, derivative = False):
         derivative: A boolean representing whether or not the derivative of the function should be returned instead.
     """
 
-    raise NotImplementedError('This function must be implemented by the student.')
+    if not derivative:
+        return (lambda _x: _x * (_x > 0))
+    return d_relu(x)
 
 
-def softmax(x, derivative = False):
+def softmax(x, derivative=False):
     x = np.clip(x, -1e100, 1e100)
     if not derivative:
-        c = np.max(x, axis = 1, keepdims = True)
-        return np.exp(x - c - np.log(np.sum(np.exp(x - c), axis = 1, keepdims = True)))
+        c = np.max(x, axis=1, keepdims=True)
+        return np.exp(x - c - np.log(np.sum(np.exp(x - c), axis=1, keepdims=True)))
     else:
         return softmax(x) * (1 - softmax(x))
 
@@ -105,9 +130,17 @@ def cross_entropy(y, p):
             A numpy array of shape (n_samples, n_outputs) representing the predicted probabilities from the softmax
             output activation function.
     """
+    A2 = p
+    Y = y
+    m = Y.shape[1]
+    
+    logprobs = np.multiply(Y ,np.log(A2)) + np.multiply((1-Y), np.log(1-A2))
+    cost = (-1/m) * np.sum(logprobs)
+    cost = float(np.squeeze(cost))
+    return cost
 
-    raise NotImplementedError('This function must be implemented by the student.')
-
+def cross_entropy_derivative(y, p):
+    return - (y / p) + (1 - y) / (1 - p)
 
 def one_hot_encoding(y):
     """
@@ -122,5 +155,5 @@ def one_hot_encoding(y):
         A numpy array of shape (n_samples, n_outputs) representing the one-hot encoded target class values for the input
         data. n_outputs is equal to the number of unique categorical class values in the numpy array y.
     """
-
-    raise NotImplementedError('This function must be implemented by the student.')
+    classes = len(np.unique(y))
+    return np.eye(classes+1)[np.array(y)]
