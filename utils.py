@@ -33,10 +33,6 @@ def manhattan_distance(x1, x2):
     return np.linalg.norm(x1 - x2, ord=1, axis=1)
 
 
-def d_identity(x):
-    return 0
-
-
 def identity(x, derivative=False):
     """
     Computes and returns the identity activation function of the given input data x. If derivative = True,
@@ -53,7 +49,7 @@ def identity(x, derivative=False):
 
 
 def d_sigmoid(x):
-    return (lambda _x: _x * (1 - _x))
+    return x * (1 - x)
 
 
 def sigmoid(x, derivative=False):
@@ -66,12 +62,12 @@ def sigmoid(x, derivative=False):
         derivative: A boolean representing whether or not the derivative of the function should be returned instead.
     """
     if not derivative:
-        return (lambda _x: 1 / (1 + np.exp(-_x)))
+        return 1 / (1 + np.exp(-x))
     return d_sigmoid(x)
 
 
 def d_tanh(x):
-    return (lambda _x: 1 - x ** 2)
+    return 1 - x ** 2
 
 
 def tanh(x, derivative=False):
@@ -85,12 +81,12 @@ def tanh(x, derivative=False):
     """
 
     if not derivative:
-        return (lambda _x: np.tanh(_x))
+        return np.tanh(x)
     return d_tanh(x)
 
 
 def d_relu(x):
-    return (lambda _x: 1 * (_x > 0))
+    return 1 * (x > 0)
 
 
 def relu(x, derivative=False):
@@ -104,7 +100,7 @@ def relu(x, derivative=False):
     """
 
     if not derivative:
-        return (lambda _x: _x * (_x > 0))
+        return x * (x > 0)
     return d_relu(x)
 
 
@@ -130,6 +126,8 @@ def cross_entropy(y, p):
             A numpy array of shape (n_samples, n_outputs) representing the predicted probabilities from the softmax
             output activation function.
     """
+    delta = 0.00000000001
+    p = np.clip(p, delta, 1-delta)
     A2 = p
     Y = y
     m = Y.shape[1]
@@ -138,9 +136,6 @@ def cross_entropy(y, p):
     cost = (-1/m) * np.sum(logprobs)
     cost = float(np.squeeze(cost))
     return cost
-
-def cross_entropy_derivative(y, p):
-    return - (y / p) + (1 - y) / (1 - p)
 
 def one_hot_encoding(y):
     """
@@ -156,4 +151,4 @@ def one_hot_encoding(y):
         data. n_outputs is equal to the number of unique categorical class values in the numpy array y.
     """
     classes = len(np.unique(y))
-    return np.eye(classes+1)[np.array(y)]
+    return np.eye(classes)[np.array(y)]
