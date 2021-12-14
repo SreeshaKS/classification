@@ -24,7 +24,19 @@ Setting the parameter to ‘distance’ assigns weights proportional to the inve
 
 - metric: represents which distance metric is used to calculate distances between samples. There are two options: ‘l1’ or ‘l2’, which refer to the Manhattan distance and Euclidean distance respectively.
 #### Command:
-<code>  python3 multilayer_perceptron.py knn </code>
+<code>  python3 k_nearest_neighbors.py knn </code>
+
+#### Approach
+##### Fit
+- Train the k-NN method - No parameters to estimate int his model. Save the training data for making predictions. KNN uses the entire dataset as memory.
+##### Predict
+- Select k and weighting method
+
+- Calculate the eucliden or manhattan distance
+- Sort all the data points with the key being the distance of each data point from the new dat apoint
+- select k data points with smallest distances
+
+
 
 
 ### [Part 2: Multilayer Perceptron Classification](https://github.iu.edu/cs-b551-fa2021/sskuruva-a4/tree/master/multilayer_perceptron.py)
@@ -43,3 +55,11 @@ method.
 • learning_rate: represents the learning rate used when updating neural network weights during gra- dient descent.
 #### Command:
 <code>  python3 multilayer_perceptron.py mlp </code>
+
+#### Approach
+##### Fit
+- Forward pass - iteratively compute weights 
+- Backward pass - nudge them using the error difference and gradient
+##### Predict
+- Computed a forward pass using the updated weights in the neurons
+- Compute the most probable class by obtaining the max of the probabilites
