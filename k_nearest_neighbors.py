@@ -53,9 +53,17 @@ class KNearestNeighbors:
         self._X = None
         self._y = None
         self._distance = euclidean_distance if metric == 'l2' else manhattan_distance
+        
+        if self.weights == "distance":
+            self._weight_func = self._weights_distance
+        else:
+            self._weight_func = self._weights_uniform
 
-    def _metric_func(self, x1, x2):
-        return self._distance(x1, x2)
+    def _weights_uniform(self, distances):
+        return np.ones(shape=distances.shape)
+
+    def _weights_distance(self, distances):
+        return 1.0  / ( distances + 1e-7)
 
     def fit(self, X, y):
         """
@@ -88,7 +96,7 @@ class KNearestNeighbors:
         nearest_distances = np.zeros(shape=(X.shape[0], self.n_neighbors), dtype=np.int) - 1
 
         for i in range(X.shape[0]):
-            distances = self._metric_func(X[i], self._X)
+            distances = self._distance(X[i], self._X)
             index_order = np.argsort(distances)[:self.n_neighbors]
             nearest_indices[i] = index_order
             nearest_distances[i] = distances[index_order]
@@ -106,12 +114,16 @@ class KNearestNeighbors:
             A numpy array of shape (n_samples,) representing the predicted target class values for the given test data.
         """
 
-        y = np.zeros(shape=(X.shape[0],))
+        y = np.zeros(X.shape[0]) - 1
 
-        nearest_indices, _ = self._nearest_neighbors(X)
+        nearest_indices, nearest_distances = self._nearest_neighbors(X)
         nearest_labels = self._y[nearest_indices]
 
-        for i in range(X.shape[0]):
-            y[i] = np.argmax(np.bincount((nearest_labels[i])))
+        weights = self._weight_func(nearest_distances)
+
+        for i in range(X.shape[0]):     
+            counts = np.bincount(nearest_labels[i])
+            weighted_sum = counts[nearest_labels[i]] * weights[i]
+            y[i] = nearest_labels[i][np.argmax(weighted_sum)]
 
         return y
