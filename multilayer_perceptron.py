@@ -152,19 +152,19 @@ class MultilayerPerceptron:
 
         # output layer->hidden layer
         loss_gradient_o_h = (A2 - y) * self._output_activation(A2, derivative=True)
-        grad_v = self.A1.T.dot(loss_gradient_o_h)
-        grad_v0 = np.sum(loss_gradient_o_h, axis=0, keepdims=True)
+        grad_o = self.A1.T.dot(loss_gradient_o_h)
+        grad_ob = np.sum(loss_gradient_o_h, axis=0, keepdims=True)
 
         # hidden layer->input layer
         gradient_hidden_input = np.dot(loss_gradient_o_h, W2.T) * self.hidden_activation(A1, derivative=True)
-        grad_w = self._X.T.dot(gradient_hidden_input)
-        grad_w0 = np.sum(gradient_hidden_input, axis=0, keepdims=True)
+        grad_h = self._X.T.dot(gradient_hidden_input)
+        grad_hb = np.sum(gradient_hidden_input, axis=0, keepdims=True)
 
-        self._o_weights -= self.learning_rate * grad_v
-        self._o_bias -= self.learning_rate * grad_v0
+        self._o_weights -= self.learning_rate * grad_o
+        self._o_bias -= self.learning_rate * grad_ob
 
-        self._h_weights -= self.learning_rate * grad_w
-        self._h_bias -= self.learning_rate * grad_w0
+        self._h_weights -= self.learning_rate * grad_h
+        self._h_bias -= self.learning_rate * grad_hb
 
     def predict(self, X):
         """

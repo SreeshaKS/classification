@@ -80,18 +80,6 @@ class KNearestNeighbors:
         self._y = y
 
     def _nearest_neighbors(self, X):
-        """
-        Get n nearest neighbors for each object in X.
-        For each object in X returns the array of n
-        closest objects in train set.
-
-        Args:
-            X(ndarray): objects
-        Return:
-            nearest_indices(ndarray): array of nearest
-                                      objects indices
-        """
-
         nearest_indices = np.zeros(shape=(X.shape[0], self.n_neighbors), dtype=np.int) - 1
         nearest_distances = np.zeros(shape=(X.shape[0], self.n_neighbors), dtype=np.int) - 1
 
